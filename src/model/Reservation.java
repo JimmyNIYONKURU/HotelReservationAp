@@ -15,9 +15,9 @@ public class Reservation {
         this.checkOutDate = checkOutDate;
     }
 
-    public String toString() {
-        String var10000 = String.valueOf(this.customer);
-        return "Reservation{customer=" + var10000 + ", room=" + String.valueOf(this.room) + ", checkInDate=" + String.valueOf(this.checkInDate) + ", checkOutDate=" + String.valueOf(this.checkOutDate) + "}";
+    public String toString()
+    {
+        return "Reservation{customer=" + String.valueOf(this.customer) + ", room=" + String.valueOf(this.room) + ", checkInDate=" + String.valueOf(this.checkInDate) + ", checkOutDate=" + String.valueOf(this.checkOutDate) + "}";
     }
 
     public Customer getCustomer() {

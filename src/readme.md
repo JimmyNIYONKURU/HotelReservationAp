@@ -30,7 +30,7 @@ To run this app, you need to have java installed on your machine. Follow these s
 2. As a customer, you can:
     * Find and reserve a room by providing checkin-date and check-out date
     * See your reservations by providing your email adress
-    * Create a new account by proving your new details
+    * Create a new account by providing your new details
 3. As an administrator, you can access the AdminMenu where you can:
     * View all customers
     * View all rooms

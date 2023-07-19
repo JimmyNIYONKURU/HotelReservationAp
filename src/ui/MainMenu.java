@@ -71,17 +71,23 @@ public class MainMenu {
             System.out.println("No rooms available for the selected dates.");
         } else {
             System.out.println("Available Rooms:");
-            Iterator var5 = availableRooms.iterator();
+            Iterator iterator1 = availableRooms.iterator();
 
             IRoom selectedRoom;
-            while(var5.hasNext()) {
-                selectedRoom = (IRoom)var5.next();
+            while(iterator1.hasNext()) {
+                selectedRoom = (IRoom)iterator1.next();
                 System.out.println(selectedRoom);
             }
 
             System.out.println("Enter the room number to reserve:");
             String roomNumber = scanner.nextLine();
             selectedRoom = HotelResource.getInstance().getRoom(roomNumber);
+            while(selectedRoom == null)
+            {
+                System.out.println("Invalid room number, please enter a valid room number!");
+                roomNumber = scanner.nextLine();
+                selectedRoom = HotelResource.getInstance().getRoom(roomNumber);
+            }
             if (selectedRoom != null) {
                 System.out.println("Enter your email address:");
                 String email = scanner.nextLine();
@@ -89,6 +95,8 @@ public class MainMenu {
                 if (customer == null) {
                     while(!pattern.matcher(email).matches()) {
                         System.out.println("Invalid email. Please enter a valid mail");
+                        email = scanner.nextLine();
+                        customer = HotelResource.getInstance().getCustomer(email);
                     }
 
                     System.out.println("Creating a new account...");
@@ -109,8 +117,6 @@ public class MainMenu {
                 } else {
                     System.out.println("Failed to make a reservation.");
                 }
-            } else {
-                System.out.println("Invalid room number.");
             }
         }
 
@@ -126,10 +132,10 @@ public class MainMenu {
                 System.out.println("You have no reservations.");
             } else {
                 System.out.println("Your Reservations:");
-                Iterator var3 = reservations.iterator();
+                Iterator iterator = reservations.iterator();
 
-                while(var3.hasNext()) {
-                    Reservation reservation = (Reservation)var3.next();
+                while(iterator.hasNext()) {
+                    Reservation reservation = (Reservation)iterator.next();
                     System.out.println(reservation);
                 }
             }
@@ -154,8 +160,8 @@ public class MainMenu {
                         CustomerService.getInstance().addCustomer(email, firstName, lastName);
                         System.out.println("Account created successfully!");
                         return;
-                    } catch (IllegalArgumentException var4) {
-                        System.out.println("Error creating account: " + var4.getMessage());
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error creating account: " + e.getMessage());
                     }
                 } else {
                     System.out.println("Invalid email address. Please enter a valid email.");
@@ -193,7 +199,7 @@ public class MainMenu {
             try {
                 date = dateFormat.parse(input);
                 isValid = true;
-            } catch (ParseException var4) {
+            } catch (ParseException e) {
                 System.out.println("Invalid date format. Please enter a date in the format MM/dd/yyyy:");
             }
         }
