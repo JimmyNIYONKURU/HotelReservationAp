@@ -19,9 +19,6 @@ public interface IRoom {
      */
     RoomType getRoomType();
 
-    /**
-     *
-     * @return  true if the room has no cost, false else
-     */
-    boolean isFree();
+
+
 }
