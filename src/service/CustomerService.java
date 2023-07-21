@@ -12,20 +12,46 @@ public class CustomerService {
     private CustomerService() {
     }
 
+    /**
+     * Adds a new customer
+     *
+     * @param email             customer email
+     * @param firstName         customer first name
+     * @param lastName          customer last name
+     */
     public void addCustomer(String email, String firstName, String lastName)
     {
         Customer customer = new Customer(firstName, lastName, email);
+        // adding the customer to the map
         this.customers.put(email, customer);
     }
 
+    /**
+     * Allow access to customer whose email is passed in parameter
+     *
+     * @param customerEmail     customer email
+     * @return                  customer whose email is parameter
+     */
     public Customer getCustomer(String customerEmail) {
+        //Accessing the map value by key
         return (Customer)this.customers.get(customerEmail);
     }
 
+    /**
+     * Allow access to all customers
+     *
+     * @return
+     */
     public Collection<Customer> getAllCustomers() {
+        //accessing the map values
         return this.customers.values();
     }
 
+    /**
+     * Ensure the existence of only one instance of the class
+     *
+     * @return      class instance
+     */
     public static CustomerService getInstance() {
         if (instance == null) {
             instance = new CustomerService();

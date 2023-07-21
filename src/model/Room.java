@@ -28,11 +28,6 @@ public class Room implements IRoom {
     }
 
     @Override
-    public boolean isFree() {
-        return roomAvailable;
-    }
-
-    @Override
     public String toString() {
         return "The room Number: " + roomNumber + "\n" +
                 "Room Type: " + roomType + "\n" +

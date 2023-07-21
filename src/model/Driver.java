@@ -1,3 +1,6 @@
+/**
+ * model classes are created in order to model our data objects for the reservation hotel reservation domain
+ */
 package model;
 
 public class Driver {
