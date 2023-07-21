@@ -9,19 +9,19 @@ public interface IRoom {
 
     /**
      *
-     * @return
+     * @return  our room price
      */
     double getRoomPrice();
 
     /**
      *
-     * @return
+     * @return  SINGLE or DOUBLE as type
      */
     RoomType getRoomType();
 
     /**
      *
-     * @return
+     * @return  true if the room has no cost, false else
      */
     boolean isFree();
 }
