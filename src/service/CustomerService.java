@@ -34,13 +34,13 @@ public class CustomerService {
      */
     public Customer getCustomer(String customerEmail) {
         //Accessing the map value by key
-        return (Customer)this.customers.get(customerEmail);
+        return this.customers.get(customerEmail);
     }
 
     /**
      * Allow access to all customers
      *
-     * @return
+     * @return       return all customers
      */
     public Collection<Customer> getAllCustomers() {
         //accessing the map values

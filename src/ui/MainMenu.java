@@ -3,10 +3,7 @@ package ui;
 import api.HotelResource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.Customer;
@@ -66,10 +63,43 @@ public class MainMenu {
         Date checkInDate = getDateInput();
         System.out.println("Enter check-out date (MM/dd/yyyy):");
         Date checkOutDate = getDateInput();
+        while(checkInDate.after(checkOutDate) || checkInDate.before(new Date())) {
+
+            System.out.println("Invalid reservation period. Check-in date must be before check-out date and in the future.");
+            System.out.println("Enter check-in date (MM/dd/yyyy):");
+            checkInDate = getDateInput();
+            System.out.println("Enter check-out date (MM/dd/yyyy):");
+            checkOutDate = getDateInput();
+
+        }
+
         Collection<IRoom> availableRooms = HotelResource.getInstance().findARoom(checkInDate, checkOutDate);
         if (availableRooms.isEmpty()) {
             System.out.println("No rooms available for the selected dates.");
-        } else {
+            //Perform recommended room research
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(checkInDate);
+            calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-in date
+            Date recommendedCheckInDate = calendar.getTime();
+            calendar.setTime(checkOutDate);
+            calendar.add(Calendar.DAY_OF_MONTH, 7);
+            Date recommendedCheckOutDate = calendar.getTime();
+            Collection<IRoom>recommendedRooms = HotelResource.getInstance().findARoom(recommendedCheckInDate,recommendedCheckOutDate);
+            if(!recommendedRooms.isEmpty())
+            {
+                System.out.println("Not rooms found at the selected date. See below our recommended rooms for one week later : ");
+                for(IRoom chamber : recommendedRooms)
+                {
+                    System.out.println(chamber);
+                }
+            }
+            else {
+                System.out.println("No recommended rooms for your dates!");
+            }
+
+        }
+
+        else {
             System.out.println("Available Rooms:");
             Iterator iterator1 = availableRooms.iterator();
 
@@ -81,11 +111,13 @@ public class MainMenu {
 
             System.out.println("Enter the room number to reserve:");
             double roomNumber = scanner.nextDouble();
+            scanner.nextLine();//consume the new line character
             selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
             while(selectedRoom == null)
             {
                 System.out.println("Invalid room number, please enter a valid room number!");
                 roomNumber = scanner.nextDouble();
+                scanner.nextLine();
                 selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
             }
             if (selectedRoom != null) {
@@ -97,6 +129,7 @@ public class MainMenu {
                         System.out.println("Invalid email. Please enter a valid mail");
                         email = scanner.nextLine();
                         customer = HotelResource.getInstance().getCustomer(email);
+
                     }
 
                     System.out.println("Creating a new account...");
