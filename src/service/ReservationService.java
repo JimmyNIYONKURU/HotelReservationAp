@@ -19,12 +19,18 @@ public class ReservationService {
      * Allow to add a room to rooms available
      *
      * @param room      room to add
-     * @return          null
+     * @return          room
      */
     public IRoom addRoom(IRoom room) {
-        rooms.add(room);
-        return null;
+        if (getRoom(room.getRoomNumber()) == null) {
+            rooms.add(room);
+            System.out.println("Room added successfully!");
+        } else {
+            System.out.println("Room with the same number already exists.");
+        }
+        return room;
     }
+
 
     /**
      * give access to room access

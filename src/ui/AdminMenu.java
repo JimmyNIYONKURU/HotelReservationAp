@@ -91,15 +91,45 @@ public class AdminMenu {
     }
 
     private static void addRoom() {
-        System.out.println("Enter the room number:");
-        String roomNumber = scanner.nextLine();
-        System.out.println("Enter the price per night:");
-        double price = getDoubleInput();
-        System.out.println("Enter the room type (SINGLE/DOUBLE):");
-        String roomType = scanner.nextLine().toUpperCase();
-        IRoom room = new Room(roomNumber, price, RoomType.valueOf(roomType));
+        boolean validRoomNumber = false;
+        double roomNumber = 0.0;
+        while (!validRoomNumber) {
+            System.out.println("Enter the room number to reserve:");
+            try {
+                roomNumber = Double.parseDouble(scanner.nextLine());
+                validRoomNumber = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid room number. Please enter a valid room number.");
+            }
+        }
+        boolean validPrice = false;
+        double price = 0.0;
+        while(!validPrice)
+        {
+            System.out.println("Enter the price per night:");
+            try{
+                price = Double.parseDouble(scanner.nextLine());
+                validPrice = true;
+            }
+            catch(NumberFormatException e)
+            {
+                System.out.println("Invalid price! Try again>...");
+            }
+        }
+
+        RoomType roomType = null;
+        while (roomType == null) {
+            System.out.println("Enter the room type (SINGLE/DOUBLE):");
+            String roomTypeString = scanner.nextLine().toUpperCase();
+            try {
+                roomType = RoomType.valueOf(roomTypeString);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid room type. Please enter SINGLE or DOUBLE.");
+            }
+        }
+        IRoom room = new Room(String.valueOf(roomNumber), price, roomType);
         AdminResource.getInstance().addRoom(room);
-        System.out.println("Room added successfully!");
+
     }
 
     private static int getUserChoice(int maxChoice) {

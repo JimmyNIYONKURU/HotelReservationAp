@@ -80,13 +80,13 @@ public class MainMenu {
             }
 
             System.out.println("Enter the room number to reserve:");
-            String roomNumber = scanner.nextLine();
-            selectedRoom = HotelResource.getInstance().getRoom(roomNumber);
+            double roomNumber = scanner.nextDouble();
+            selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
             while(selectedRoom == null)
             {
                 System.out.println("Invalid room number, please enter a valid room number!");
-                roomNumber = scanner.nextLine();
-                selectedRoom = HotelResource.getInstance().getRoom(roomNumber);
+                roomNumber = scanner.nextDouble();
+                selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
             }
             if (selectedRoom != null) {
                 System.out.println("Enter your email address:");
@@ -181,7 +181,7 @@ public class MainMenu {
                 if (choice < 1 || choice > maxChoice) {
                     System.out.println("Invalid input. Please enter a number between 1 and " + maxChoice + ".");
                 }
-            } catch (NumberFormatException var3) {
+            } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
             }
         }
