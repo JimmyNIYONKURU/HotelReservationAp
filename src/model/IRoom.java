@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Date;
+
 public interface IRoom {
     /**
      * allow access to room number
@@ -21,6 +23,7 @@ public interface IRoom {
      * @return  type
      */
     RoomType getRoomType();
+
 
 
 

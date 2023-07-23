@@ -1,15 +1,19 @@
 package model;
 
+import java.util.Date;
+
 public class Room implements IRoom {
     private String roomNumber;
     private double roomPrice;
     private RoomType roomType;
-    private boolean roomAvailable = true;
+
 
     public Room(String roomNumber, double roomPrice, RoomType roomType) {
+        super();
         this.roomNumber = roomNumber;
         this.roomPrice = roomPrice;
         this.roomType = roomType;
+
     }
 
     @Override
@@ -26,6 +30,7 @@ public class Room implements IRoom {
     public RoomType getRoomType() {
         return roomType;
     }
+
 
     @Override
     public String toString() {
