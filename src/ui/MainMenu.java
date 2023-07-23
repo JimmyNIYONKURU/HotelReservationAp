@@ -78,6 +78,12 @@ public class MainMenu {
         return HotelResource.getInstance().findARoom(recommendedCheckInDate,recommendedCheckOutDate);
     }
 
+    /**
+     * Allow the customer to reserve recommended rooms
+     *
+     * @param recommendedRooms     rooms to be free soon
+     * @return                     true if yes, false if not
+     */
     private static boolean askToReserveRecommendedRoom(Collection<IRoom> recommendedRooms) {
         System.out.println("No rooms found at the selected date. See below our recommended rooms for one week later:");
         for (IRoom room : recommendedRooms) {
