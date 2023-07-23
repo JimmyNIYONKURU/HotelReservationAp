@@ -59,6 +59,13 @@ public class MainMenu {
         return matcher.matches();
     }
 
+    /**
+     * give access to the rooms that will be released in less than one week
+     *
+     * @param checkInDate       original date to enter
+     * @param checkOutDate      original date to release the room
+     * @return                  recommended rooms
+     */
     private static Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
     {
         Calendar calendar = Calendar.getInstance();
