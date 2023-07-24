@@ -94,9 +94,20 @@ public class MainMenu {
         for (IRoom room : recommendedRooms) {
             System.out.println(room);
         }
-        System.out.println("Do you want to reserve one of them? (yes/no)");
-        String reply = scanner.nextLine().toLowerCase();
-        return reply.equals("yes");
+
+        System.out.println("Do you want to reserve one of these rooms? (yes/no)");
+        String answer = scanner.nextLine().toLowerCase();
+        while(!(answer.equals("yes") || answer.equals("no")))
+        {
+            System.out.println("Invalid reply. Please enter yes or no");
+            System.out.println("Do you want to reserve one of these rooms? (yes/no)");
+            answer = scanner.nextLine().toLowerCase();
+        }
+        if(answer.equals("no"))
+        {
+            displayMenu();
+        }
+        return answer.equals("yes");
     }
     private static void reserveRecommendedRooms(Collection<IRoom> recommendedRooms, Date checkInDate, Date checkOutDate, String email) {
         String emailRegex = "^(.+)@(.+).com$";
