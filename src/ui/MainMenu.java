@@ -14,6 +14,8 @@ import model.IRoom;
 import model.Reservation;
 import service.CustomerService;
 
+
+
 public class MainMenu {
     private static final Scanner scanner;
     private static final SimpleDateFormat dateFormat;
@@ -75,7 +77,10 @@ public class MainMenu {
         calendar.setTime(checkOutDate);
         calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-out date
         Date recommendedCheckOutDate = calendar.getTime();
-        return HotelResource.getInstance().findARoom(recommendedCheckInDate,recommendedCheckOutDate);
+
+        Collection<IRoom>recommendedRooms =HotelResource.getInstance().findARoom(recommendedCheckInDate,recommendedCheckOutDate);
+        return recommendedRooms;
+
     }
 
     /**
@@ -93,6 +98,80 @@ public class MainMenu {
         String reply = scanner.nextLine().toLowerCase();
         return reply.equals("yes");
     }
+    private static void reserveRecommendedRooms(Collection<IRoom> recommendedRooms, Date checkInDate, Date checkOutDate, String email) {
+        String emailRegex = "^(.+)@(.+).com$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(checkInDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 7); // Add 7 days to check-in date
+        Date recommendedCheckInDate = calendar.getTime();
+
+        calendar.setTime(checkOutDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 7); // Add 7 days to check-out date
+        Date recommendedCheckOutDate = calendar.getTime();
+        IRoom selectedRoom = null;
+        findRecommendedRooms(checkInDate,checkOutDate);
+        System.out.println("Attention! The ckeck-in date will be one week after you original date and the period of time will be the same.Do you still want to reserve one of these rooms? (yes/no)");
+        String answer = scanner.nextLine().toLowerCase();
+        while(!(answer.equals("yes") || answer.equals("no")))
+        {
+            System.out.println("Invalid reply. Please enter yes or no");
+            answer = scanner.nextLine().toLowerCase();
+        }
+        if (answer.equals("yes")) {
+            System.out.println("Enter the room number to reserve:");
+            String roomNumberStr;
+            double roomNumber;
+            selectedRoom = null;
+
+            while (selectedRoom == null) {
+                roomNumberStr = scanner.nextLine();
+                try {
+                    roomNumber = Double.parseDouble(roomNumberStr);
+                    selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
+                    if (selectedRoom == null) {
+                        System.out.println("Invalid room number, please enter a valid room number!");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid room number, please enter a valid room number!");
+                }
+            }
+
+            if (selectedRoom != null) {
+                if (email.isEmpty()) {
+                    System.out.println("Enter your email address:");
+                    email = scanner.nextLine();
+                }
+
+                Customer customer = HotelResource.getInstance().getCustomer(email);
+                if (customer == null) {
+                    while (!pattern.matcher(email).matches()) {
+                        System.out.println("Invalid email. Please enter a valid mail");
+                        email = scanner.nextLine();
+                        customer = HotelResource.getInstance().getCustomer(email);
+                    }
+                    System.out.println("Creating a new account...");
+                    System.out.println("Enter your first name:");
+                    String firstName = scanner.nextLine();
+                    System.out.println("Enter your last name:");
+                    String lastName = scanner.nextLine();
+                    HotelResource.getInstance().createACustomer(email, firstName, lastName);
+                    System.out.println("Account created successfully!");
+                    customer = HotelResource.getInstance().getCustomer(email);
+                }
+
+                Reservation reservation = HotelResource.getInstance().bookARoom(email, selectedRoom, recommendedCheckInDate, recommendedCheckOutDate);
+                if (reservation != null) {
+                    System.out.println("Reservation successful!");
+                    System.out.println("Reservation details:");
+                    System.out.println(reservation);
+                } else {
+                    System.out.println("Failed to make a reservation.");
+                }
+            }
+        }
+    }
+
     private static void findAndReserveRoom() {
         String emailRegex = "^(.+)@(.+).com$";
         Pattern pattern = Pattern.compile(emailRegex);
@@ -114,16 +193,38 @@ public class MainMenu {
         if (availableRooms.isEmpty()) {
             Collection<IRoom> recommendedRooms = findRecommendedRooms(checkInDate, checkOutDate);
 
-            if(!recommendedRooms.isEmpty())
-            {
-                if(askToReserveRecommendedRoom(recommendedRooms))
-                {
-                    findAndReserveRoom();
+            if (!recommendedRooms.isEmpty()) {
+                if (askToReserveRecommendedRoom(recommendedRooms)) {
+                    String email;
+                    Customer customer;
+
+                    // Check if the customer already has an account
+                    System.out.println("Enter your email address:");
+                    email = scanner.nextLine();
+                    customer = HotelResource.getInstance().getCustomer(email);
+                    if (customer == null) {
+                        while (!isValidEmail(email)) {
+                            System.out.println("Invalid email. Please enter a valid mail");
+                            email = scanner.nextLine();
+                            customer = HotelResource.getInstance().getCustomer(email);
+                        }
+
+                        System.out.println("Creating a new account...");
+                        System.out.println("Enter your first name:");
+                        String firstName = scanner.nextLine();
+                        System.out.println("Enter your last name:");
+                        String lastName = scanner.nextLine();
+                        HotelResource.getInstance().createACustomer(email, firstName, lastName);
+                        System.out.println("Account created successfully!");
+                        customer = HotelResource.getInstance().getCustomer(email);
+                    }
+
+                    reserveRecommendedRooms(recommendedRooms, checkInDate, checkOutDate, email);
                 }
-            }
-            else {
+            } else {
                 System.out.println("No recommended rooms for your dates!");
             }
+
 
         }
 
@@ -143,7 +244,7 @@ public class MainMenu {
                 else {
                     roomPrice = "$ " + selectedRoom.getRoomPrice() + " per night";
                 }
-                System.out.println(selectedRoom.getRoomNumber()+ " - "+ roomPrice + " - " + selectedRoom.getRoomType());
+                System.out.println("room number: " + selectedRoom.getRoomNumber()+ " - "+ roomPrice + " - " + selectedRoom.getRoomType());
             }
 
             System.out.println("Do you want to reserve one of these rooms? (yes/no)");
@@ -156,16 +257,24 @@ public class MainMenu {
             }
             if (answer.equals("yes")) {
                 System.out.println("Enter the room number to reserve:");
-                double roomNumber = scanner.nextDouble();
-                scanner.nextLine();//consume the new line character
-                selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
-                while (selectedRoom == null)
-                {
-                    System.out.println("Invalid room number, please enter a valid room number!");
-                    roomNumber = scanner.nextDouble();
-                    scanner.nextLine();
-                    selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
+                String roomNumberStr;
+                double roomNumber;
+                selectedRoom = null;
+
+                while (selectedRoom == null) {
+                    roomNumberStr = scanner.nextLine();
+                    try {
+                        roomNumber = Double.parseDouble(roomNumberStr);
+                        selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
+                        if (selectedRoom == null) {
+                            System.out.println("Invalid room number, please enter a valid room number!");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid room number, please enter a valid room number!");
+                    }
                 }
+
+
                 if (selectedRoom != null) {
                     System.out.println("Enter your email address:");
                     String email = scanner.nextLine();
@@ -178,15 +287,14 @@ public class MainMenu {
                             customer = HotelResource.getInstance().getCustomer(email);
 
                         }
-
-                        System.out.println("Creating a new account...");
-                        System.out.println("Enter your first name:");
-                        String firstName = scanner.nextLine();
-                        System.out.println("Enter your last name:");
-                        String lastName = scanner.nextLine();
-                        HotelResource.getInstance().createACustomer(email, firstName, lastName);
-                        System.out.println("Account created successfully!");
-                        customer = HotelResource.getInstance().getCustomer(email);
+                    System.out.println("Creating a new account...");
+                    System.out.println("Enter your first name:");
+                    String firstName = scanner.nextLine();
+                    System.out.println("Enter your last name:");
+                    String lastName = scanner.nextLine();
+                    HotelResource.getInstance().createACustomer(email, firstName, lastName);
+                    System.out.println("Account created successfully!");
+                    customer = HotelResource.getInstance().getCustomer(email);
                     }
 
                     Reservation reservation = HotelResource.getInstance().bookARoom(email, selectedRoom, checkInDate, checkOutDate);
@@ -234,20 +342,20 @@ public class MainMenu {
         String lastName = scanner.nextLine();
 
 
-            while(true) {
-                System.out.println("Enter your email address:");
-                String email = scanner.nextLine();
-                if (isValidEmail(email)) {
-                    try {
-                        CustomerService.getInstance().addCustomer(email, firstName, lastName);
-                        System.out.println("Account created successfully!");
-                        return;
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Error creating account: " + e.getMessage());
-                    }
-                } else {
-                    System.out.println("Invalid email address. Please enter a valid email.");
+        while(true) {
+            System.out.println("Enter your email address:");
+            String email = scanner.nextLine();
+            if (isValidEmail(email)) {
+                try {
+                    CustomerService.getInstance().addCustomer(email, firstName, lastName);
+                    System.out.println("Account created successfully!");
+                    return;
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error creating account: " + e.getMessage());
                 }
+            } else {
+                System.out.println("Invalid email address. Please enter a valid email.");
+            }
 
         }
     }

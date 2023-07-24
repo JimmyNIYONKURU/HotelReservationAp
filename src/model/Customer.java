@@ -8,7 +8,7 @@ public class Customer {
     private String email;
 
     private static final String emailRegex = "^(.+)@(.+).com$";
-    private static final Pattern pattern = Pattern.compile(emailRegex);
+    public static final Pattern pattern = Pattern.compile(emailRegex);
 
     public Customer(String firstName, String lastName, String email) {
         this.firstName = firstName;

@@ -1,6 +1,6 @@
 package ui;
 
-public class HotelApplication {
+public class   HotelApplication {
     public HotelApplication() {
     }
 
