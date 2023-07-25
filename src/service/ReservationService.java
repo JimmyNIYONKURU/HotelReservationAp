@@ -173,4 +173,21 @@ public class ReservationService {
     public Collection<IRoom> getAllRooms() {
         return rooms;
     }
+
+    public boolean isRoomReservedAtDate(IRoom room, Date date)
+    {
+        for (Reservation reservation : reservations)
+        {
+            if (reservation.getRoom().equals(room) && isDateWithinRange(date, reservation.getCheckInDate(), reservation.getCheckOutDate()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean isDateWithinRange(Date date, Date checkinDate, Date checkoutDate)
+    {
+        return !date.before(checkinDate) && !date.after(checkoutDate);
+    }
 }
+

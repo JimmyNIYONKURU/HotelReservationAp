@@ -76,17 +76,17 @@ public class MainMenu {
 
         System.out.println("Do you want to reserve one of these rooms? (yes/no)");
         String answer = scanner.nextLine().toLowerCase();
-        while(!(answer.equals("yes") || answer.equals("no")))
+        while(!(answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("no")))
         {
             System.out.println("Invalid reply. Please enter yes or no");
             System.out.println("Do you want to reserve one of these rooms? (yes/no)");
-            answer = scanner.nextLine().toLowerCase();
+            answer = scanner.nextLine();
         }
         if(answer.equals("no"))
         {
             displayMenu();
         }
-        return answer.equals("yes");
+        return answer.equalsIgnoreCase("yes");
     }
     private static void reserveRecommendedRooms(Collection<IRoom> recommendedRooms, Date checkInDate, Date checkOutDate, String email) {
         String emailRegex = "^(.+)@(.+).com$";
@@ -102,13 +102,13 @@ public class MainMenu {
         IRoom selectedRoom = null;
         HotelResource.getInstance().findRecommendedRooms(checkInDate,checkOutDate);
         System.out.println("Attention! The ckeck-in date will be one week after you original date and the period of time will be the same.Do you still want to reserve one of these rooms? (yes/no)");
-        String answer = scanner.nextLine().toLowerCase();
-        while(!(answer.equals("yes") || answer.equals("no")))
+        String answer = scanner.nextLine();
+        while(!(answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("no")))
         {
             System.out.println("Invalid reply. Please enter yes or no");
-            answer = scanner.nextLine().toLowerCase();
+            answer = scanner.nextLine();
         }
-        if (answer.equals("yes")) {
+        if (answer.equalsIgnoreCase("yes")) {
             System.out.println("Enter the room number to reserve:");
             String roomNumberStr;
             double roomNumber;
@@ -121,6 +121,9 @@ public class MainMenu {
                     selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
                     if (selectedRoom == null) {
                         System.out.println("Invalid room number, please enter a valid room number!");
+                    } else if (HotelResource.getInstance().isRoomReservedAtDate(selectedRoom, addDays(checkInDate,7))) {
+                        System.out.println("This room is already reserved. Please try another one.");
+                        selectedRoom = null;
                     }
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid room number, please enter a valid room number!");
@@ -128,6 +131,22 @@ public class MainMenu {
             }
 
             if (selectedRoom != null) {
+                while(HotelResource.getInstance().isRoomReservedAtDate(selectedRoom, addDays(checkInDate,7)))
+                {
+                    System.out.println("This room is already reserved. Please try another one");
+                    roomNumberStr = scanner.nextLine();
+
+                    try
+                    {
+                        roomNumber = Double.parseDouble(roomNumberStr);
+                        selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
+                        System.out.println("Invalid room number, please enter a valid room number!");
+
+                    } catch (NumberFormatException e)
+                    {
+                        System.out.println("Invalid room number, please enter a valid room number!");
+                    }
+                }
                 if (email.isEmpty()) {
                     System.out.println("Enter your email address:");
                     email = scanner.nextLine();
@@ -223,15 +242,17 @@ public class MainMenu {
             String roomPrice;
             Iterator iterator1 = availableRooms.iterator();
 
-            IRoom selectedRoom;
-            while (iterator1.hasNext()) {
+            IRoom selectedRoom ;
+            while (iterator1.hasNext())
+            {
                 selectedRoom = (IRoom) iterator1.next();
                 if (selectedRoom.getRoomPrice()==0.0)
                 {
                     selectedRoom = new FreeRoom(selectedRoom.getRoomNumber(),selectedRoom.getRoomType());
                     roomPrice = "Free";
                 }
-                else {
+                else
+                {
                     roomPrice = "$ " + selectedRoom.getRoomPrice() + " per night";
                 }
                 System.out.println("room number: " + selectedRoom.getRoomNumber()+ " - "+ roomPrice + " - " + selectedRoom.getRoomType());
@@ -242,10 +263,10 @@ public class MainMenu {
             while(!(answer.equals("yes") || answer.equals("no")))
             {
                 System.out.println("Invalid reply. Please enter yes or no");
-                System.out.println("Do you want to reserve one of these rooms? (yes/no)");
                 answer = scanner.nextLine().toLowerCase();
             }
-            if (answer.equals("yes")) {
+            if (answer.equals("yes"))
+            {
                 System.out.println("Enter the room number to reserve:");
                 String roomNumberStr;
                 double roomNumber;
@@ -258,6 +279,9 @@ public class MainMenu {
                         selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
                         if (selectedRoom == null) {
                             System.out.println("Invalid room number, please enter a valid room number!");
+                        } else if (HotelResource.getInstance().isRoomReservedAtDate(selectedRoom, checkInDate)) {
+                            System.out.println("This room is already reserved. Please try another one.");
+                            selectedRoom = null;
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Invalid room number, please enter a valid room number!");
@@ -266,7 +290,23 @@ public class MainMenu {
 
 
                 if (selectedRoom != null) {
-                    System.out.println("Enter your email address:");
+                    while(HotelResource.getInstance().isRoomReservedAtDate(selectedRoom, checkInDate))
+                    {
+                        System.out.println("This room is already reserved. Please try another one");
+                        roomNumberStr = scanner.nextLine();
+
+                        try
+                        {
+                            roomNumber = Double.parseDouble(roomNumberStr);
+                            selectedRoom = HotelResource.getInstance().getRoom(String.valueOf(roomNumber));
+                            System.out.println("Invalid room number, please enter a valid room number!");
+
+                        } catch (NumberFormatException e)
+                        {
+                            System.out.println("Invalid room number, please enter a valid room number!");
+                        }
+                    }
+                    System.out.println("Enter your email address: e.g: name@domain.com");
                     String email = scanner.nextLine();
                     Customer customer = HotelResource.getInstance().getCustomer(email);
                     if (customer == null) {
@@ -390,5 +430,12 @@ public class MainMenu {
     static {
         scanner = new Scanner(System.in);
         dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    }
+
+    private static Date addDays(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, days);
+        return calendar.getTime();
     }
 }

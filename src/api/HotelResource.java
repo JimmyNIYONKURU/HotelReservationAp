@@ -63,5 +63,10 @@ public class HotelResource {
         return recommendedRooms;
 
     }
+    public boolean isRoomReservedAtDate(IRoom room, Date date)
+    {
+        return ReservationService.getInstance().isRoomReservedAtDate(room, date);
+    }
+
 }
 
