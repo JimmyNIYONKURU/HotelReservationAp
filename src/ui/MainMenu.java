@@ -61,27 +61,6 @@ public class MainMenu {
         return matcher.matches();
     }
 
-    /**
-     * give access to the rooms that will be released in less than one week
-     *
-     * @param checkInDate       original date to enter
-     * @param checkOutDate      original date to release the room
-     * @return                  recommended rooms
-     */
-    private static Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
-    {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(checkInDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-in date
-        Date recommendedCheckInDate = calendar.getTime();
-        calendar.setTime(checkOutDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-out date
-        Date recommendedCheckOutDate = calendar.getTime();
-
-        Collection<IRoom>recommendedRooms =HotelResource.getInstance().findARoom(recommendedCheckInDate,recommendedCheckOutDate);
-        return recommendedRooms;
-
-    }
 
     /**
      * Allow the customer to reserve recommended rooms
@@ -121,7 +100,7 @@ public class MainMenu {
         calendar.add(Calendar.DAY_OF_MONTH, 7); // Add 7 days to check-out date
         Date recommendedCheckOutDate = calendar.getTime();
         IRoom selectedRoom = null;
-        findRecommendedRooms(checkInDate,checkOutDate);
+        HotelResource.getInstance().findRecommendedRooms(checkInDate,checkOutDate);
         System.out.println("Attention! The ckeck-in date will be one week after you original date and the period of time will be the same.Do you still want to reserve one of these rooms? (yes/no)");
         String answer = scanner.nextLine().toLowerCase();
         while(!(answer.equals("yes") || answer.equals("no")))
@@ -202,7 +181,7 @@ public class MainMenu {
 
         Collection<IRoom> availableRooms = HotelResource.getInstance().findARoom(checkInDate, checkOutDate);
         if (availableRooms.isEmpty()) {
-            Collection<IRoom> recommendedRooms = findRecommendedRooms(checkInDate, checkOutDate);
+            Collection<IRoom> recommendedRooms = HotelResource.getInstance().findRecommendedRooms(checkInDate, checkOutDate);
 
             if (!recommendedRooms.isEmpty()) {
                 if (askToReserveRecommendedRoom(recommendedRooms)) {

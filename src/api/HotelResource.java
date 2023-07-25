@@ -1,5 +1,6 @@
 package api;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import model.Customer;
@@ -46,6 +47,21 @@ public class HotelResource {
 
     public Collection<IRoom> findARoom(Date checkinDate, Date checkOutDate) {
         return ReservationService.getInstance().findRooms(checkinDate, checkOutDate);
+    }
+
+    /**
+     * give access to the rooms that will be released in less than one week
+     *
+     * @param checkInDate       original date to enter
+     * @param checkOutDate      original date to release the room
+     * @return                  recommended rooms
+     */
+    public Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
+    {
+
+        Collection<IRoom>recommendedRooms =ReservationService.getInstance().findRecommendedRooms(checkInDate,checkOutDate);
+        return recommendedRooms;
+
     }
 }
 

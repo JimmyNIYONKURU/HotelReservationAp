@@ -2,6 +2,7 @@ package service;
 
 import java.util.*;
 
+import api.HotelResource;
 import model.Customer;
 import model.IRoom;
 import model.Reservation;
@@ -77,6 +78,26 @@ public class ReservationService {
             }
         }
         return availableRooms;
+    }
+    /**
+     * give access to the rooms that will be released in less than one week
+     *
+     * @param checkInDate       original date to enter
+     * @param checkOutDate      original date to release the room
+     * @return                  recommended rooms
+     */
+    public Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(checkInDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-in date
+        Date recommendedCheckInDate = calendar.getTime();
+        calendar.setTime(checkOutDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-out date
+        Date recommendedCheckOutDate = calendar.getTime();
+        Collection<IRoom>recommendedRooms = findRooms(recommendedCheckInDate,recommendedCheckOutDate);
+        return recommendedRooms;
+
     }
 
     /**
