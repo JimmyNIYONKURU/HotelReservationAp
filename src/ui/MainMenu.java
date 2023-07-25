@@ -188,9 +188,10 @@ public class MainMenu {
         Date checkInDate = getDateInput();
         System.out.println("Enter check-out date (MM/dd/yyyy):");
         Date checkOutDate = getDateInput();
-        while(checkInDate.after(checkOutDate) || checkInDate.before(new Date())) {
+        while(checkInDate.after(checkOutDate) || checkInDate.before(new Date())||checkInDate.equals(checkOutDate))
+        {
 
-            System.out.println("Invalid reservation period. Check-in date must be before check-out date and in the future.");
+            System.out.println("Invalid reservation period. Check-in date must be before check-out date and in the future.Note that the minimum stay is 24 hrs");
             System.out.println("Enter check-in date (MM/dd/yyyy):");
             checkInDate = getDateInput();
             System.out.println("Enter check-out date (MM/dd/yyyy):");
