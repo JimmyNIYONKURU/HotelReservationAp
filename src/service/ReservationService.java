@@ -1,8 +1,9 @@
 package service;
 
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.*;
 
-import api.HotelResource;
 import model.Customer;
 import model.IRoom;
 import model.Reservation;
@@ -57,7 +58,7 @@ public class ReservationService {
      * @param checkOutDate  The date he'll be leaving
      * @return              a reservation
      */
-    public Reservation reserveARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation reserveARoom(Customer customer, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         Reservation reservation = new Reservation(customer, room, checkInDate, checkOutDate);
         reservations.add(reservation);
         return reservation;
@@ -70,7 +71,7 @@ public class ReservationService {
      * @param checkOutDate      date at which the room will be released
      * @return                  all rooms available on a given time interval
      */
-    public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
+    public Collection<IRoom> findRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         List<IRoom> availableRooms = new ArrayList<>();
         for (IRoom room : rooms) {
             if (isRoomAvailable(room, checkInDate, checkOutDate)) {
@@ -86,15 +87,12 @@ public class ReservationService {
      * @param checkOutDate      original date to release the room
      * @return                  recommended rooms
      */
-    public Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
+    public Collection<IRoom>findRecommendedRooms(LocalDate checkInDate, LocalDate checkOutDate)
     {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(checkInDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-in date
-        Date recommendedCheckInDate = calendar.getTime();
-        calendar.setTime(checkOutDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);//Add 7 days to original check-out date
-        Date recommendedCheckOutDate = calendar.getTime();
+
+        LocalDate recommendedCheckInDate = checkInDate.plusDays(7);
+
+        LocalDate recommendedCheckOutDate = checkOutDate.plusDays(7);
         Collection<IRoom>recommendedRooms = findRooms(recommendedCheckInDate,recommendedCheckOutDate);
         return recommendedRooms;
 
@@ -133,10 +131,10 @@ public class ReservationService {
      * @param checkOutDate      deadline to release the room
      * @return                  true if the room is available, false else
      */
-    private boolean isRoomAvailable(IRoom room, Date checkInDate, Date checkOutDate) {
+    private boolean isRoomAvailable(IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         for (Reservation reservation : reservations) {
             if (reservation.getRoom().equals(room)) {
-                if (!(checkOutDate.before(reservation.getCheckInDate()) || checkInDate.after(reservation.getCheckOutDate()))) {
+                if (!(checkOutDate.isBefore(reservation.getCheckInDate()) || checkInDate.isAfter(reservation.getCheckOutDate()))) {
                     return false;
                 }
             }
@@ -174,7 +172,7 @@ public class ReservationService {
         return rooms;
     }
 
-    public boolean isRoomReservedAtDate(IRoom room, Date date)
+    public boolean isRoomReservedAtDate(IRoom room, LocalDate date)
     {
         for (Reservation reservation : reservations)
         {
@@ -185,9 +183,9 @@ public class ReservationService {
         }
         return false;
     }
-    private boolean isDateWithinRange(Date date, Date checkinDate, Date checkoutDate)
+    private boolean isDateWithinRange(LocalDate date, ChronoLocalDate checkinDate, ChronoLocalDate checkoutDate)
     {
-        return !date.before(checkinDate) && !date.after(checkoutDate);
+        return !date.isBefore(checkinDate) && !date.isAfter(checkoutDate);
     }
 }
 

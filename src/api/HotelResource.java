@@ -1,8 +1,8 @@
 package api;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
+
 import model.Customer;
 import model.IRoom;
 import model.Reservation;
@@ -35,7 +35,7 @@ public class HotelResource {
         return ReservationService.getInstance().getRoom(roomNumber);
     }
 
-    public Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation bookARoom(String customerEmail, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         Customer customer = CustomerService.getInstance().getCustomer(customerEmail);
         return customer != null ? ReservationService.getInstance().reserveARoom(customer, room, checkInDate, checkOutDate) : null;
     }
@@ -45,7 +45,7 @@ public class HotelResource {
         return customer != null ? ReservationService.getInstance().getCustomersReservation(customer) : null;
     }
 
-    public Collection<IRoom> findARoom(Date checkinDate, Date checkOutDate) {
+    public Collection<IRoom> findARoom(LocalDate checkinDate, LocalDate checkOutDate) {
         return ReservationService.getInstance().findRooms(checkinDate, checkOutDate);
     }
 
@@ -56,14 +56,14 @@ public class HotelResource {
      * @param checkOutDate      original date to release the room
      * @return                  recommended rooms
      */
-    public Collection<IRoom>findRecommendedRooms(Date checkInDate, Date checkOutDate)
+    public Collection<IRoom>findRecommendedRooms(LocalDate checkInDate, LocalDate checkOutDate)
     {
 
         Collection<IRoom>recommendedRooms =ReservationService.getInstance().findRecommendedRooms(checkInDate,checkOutDate);
         return recommendedRooms;
 
     }
-    public boolean isRoomReservedAtDate(IRoom room, Date date)
+    public boolean isRoomReservedAtDate(IRoom room, LocalDate date)
     {
         return ReservationService.getInstance().isRoomReservedAtDate(room, date);
     }

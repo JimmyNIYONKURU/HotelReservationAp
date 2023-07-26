@@ -1,14 +1,15 @@
 package model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 
 public class Reservation {
     private Customer customer;
     private IRoom room;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
 
-    public Reservation(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation(Customer customer, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         this.customer = customer;
         this.room = room;
         this.checkInDate = checkInDate;
@@ -28,11 +29,11 @@ public class Reservation {
         return this.room;
     }
 
-    public Date getCheckInDate() {
+    public ChronoLocalDate getCheckInDate() {
         return this.checkInDate;
     }
 
-    public Date getCheckOutDate() {
+    public ChronoLocalDate getCheckOutDate() {
         return this.checkOutDate;
     }
 }

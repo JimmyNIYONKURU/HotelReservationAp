@@ -3,8 +3,10 @@ package ui;
 import api.HotelResource;
 
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,17 +90,13 @@ public class MainMenu {
         }
         return answer.equalsIgnoreCase("yes");
     }
-    private static void reserveRecommendedRooms(Collection<IRoom> recommendedRooms, Date checkInDate, Date checkOutDate, String email) {
+    private static void reserveRecommendedRooms(Collection<IRoom> recommendedRooms, LocalDate checkInDate, LocalDate checkOutDate, String email) {
         String emailRegex = "^(.+)@(.+).com$";
         Pattern pattern = Pattern.compile(emailRegex);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(checkInDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7); // Add 7 days to check-in date
-        Date recommendedCheckInDate = calendar.getTime();
 
-        calendar.setTime(checkOutDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 7); // Add 7 days to check-out date
-        Date recommendedCheckOutDate = calendar.getTime();
+
+        LocalDate recommendedCheckInDate = checkInDate.plusDays(7);
+        LocalDate recommendedCheckOutDate = checkOutDate.plusDays(7);
         IRoom selectedRoom = null;
         HotelResource.getInstance().findRecommendedRooms(checkInDate,checkOutDate);
         System.out.println("Attention! The ckeck-in date will be one week after you original date and the period of time will be the same.Do you still want to reserve one of these rooms? (yes/no)");
@@ -185,10 +183,10 @@ public class MainMenu {
         String emailRegex = "^(.+)@(.+).com$";
         Pattern pattern = Pattern.compile(emailRegex);
         System.out.println("Enter check-in date (MM/dd/yyyy):");
-        Date checkInDate = getDateInput();
+        LocalDate checkInDate = getDateInput();
         System.out.println("Enter check-out date (MM/dd/yyyy):");
-        Date checkOutDate = getDateInput();
-        while(checkInDate.after(checkOutDate) || checkInDate.before(new Date())||checkInDate.equals(checkOutDate))
+        LocalDate checkOutDate = getDateInput();
+        while(checkInDate.isAfter(checkOutDate) || checkInDate.isBefore(LocalDate.now()) || checkInDate.equals(checkOutDate))
         {
 
             System.out.println("Invalid reservation period. Check-in date must be before check-out date and in the future.Note that the minimum stay is 24 hrs");
@@ -410,17 +408,19 @@ public class MainMenu {
         return choice;
     }
 
-    private static Date getDateInput() {
-        Date date = null;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+    private static LocalDate getDateInput() {
+        LocalDate date = null;
         boolean isValid = false;
 
         while(!isValid) {
             String input = scanner.nextLine();
 
             try {
-                date = dateFormat.parse(input);
+                date = LocalDate.parse(input, DATE_FORMATTER);
                 isValid = true;
-            } catch (ParseException e) {
+            } catch (DateTimeParseException e) {
                 System.out.println("Invalid date format. Please enter a date in the format MM/dd/yyyy:");
             }
         }
@@ -433,10 +433,13 @@ public class MainMenu {
         dateFormat = new SimpleDateFormat("MM/dd/yyyy");
     }
 
-    private static Date addDays(Date date, int days) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, days);
-        return calendar.getTime();
+    private static LocalDate addDays(LocalDate date, int days) {
+       return date.plusDays(days);
     }
+
+    private static boolean isSameDate(LocalDate date1, LocalDate date2) {
+        return date1.equals(date2);
+    }
+
+
 }
